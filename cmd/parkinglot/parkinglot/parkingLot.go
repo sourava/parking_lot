@@ -1,6 +1,8 @@
 package parkinglot
 
-import "errors"
+import (
+	"errors"
+)
 
 type ParkingLot struct {
 	SlotsAvailable []int
@@ -23,4 +25,14 @@ func New(numberOfSlots int) (*ParkingLot, error) {
 		TotalSlots: numberOfSlots,
 		EmptySlots: numberOfSlots,
 	}, nil
+}
+
+func (p *ParkingLot) Park() (int, error) {
+	if p.EmptySlots == 0 {
+		return 0, errors.New("Sorry, parking lot is full")
+	}
+	firstSlot := p.SlotsAvailable[0]
+	p.SlotsAvailable = p.SlotsAvailable[1:]
+	p.EmptySlots = p.EmptySlots - 1
+	return firstSlot, nil
 }
