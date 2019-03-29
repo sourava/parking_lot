@@ -51,3 +51,49 @@ func TestPark_ShouldReturnASlot_WhenSlotsAreAvailable(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal(2, slot)
 }
+
+func TestUnPark_ShouldReturnError_WhenGivenSlotNumberIsNotInRange(t *testing.T) {
+	assert := assert.New(t)
+
+	parkingLot, err := New(5)
+
+	err = parkingLot.UnPark(0)
+	assert.NotNil(err)
+	assert.Equal("Invalid slot number", err.Error())
+
+	err = parkingLot.UnPark(6)
+	assert.NotNil(err)
+	assert.Equal("Invalid slot number", err.Error())
+}
+
+func TestUnPark_ShouldReturnError_WhenGivenSlotNumberIsAlreadyEmpty(t *testing.T) {
+	assert := assert.New(t)
+
+	parkingLot, err := New(5)
+
+	err = parkingLot.UnPark(4)
+	assert.NotNil(err)
+	assert.Equal("Slot already empty", err.Error())
+}
+
+func TestUnPark_ShouldMakeSlotNumberAvailable_WhenGivenSlotNumberIsFilled(t *testing.T) {
+	assert := assert.New(t)
+
+	parkingLot, err := New(5)
+	_, err = parkingLot.Park()
+	_, err = parkingLot.Park()
+	_, err = parkingLot.Park()
+	_, err = parkingLot.Park()
+
+	err = parkingLot.UnPark(2)
+	assert.Nil(err)
+	assert.Equal(2, parkingLot.EmptySlots)
+	assert.Equal(5, parkingLot.TotalSlots)
+	assert.Equal([]int{2, 5}, parkingLot.SlotsAvailable)
+
+	err = parkingLot.UnPark(4)
+	assert.Nil(err)
+	assert.Equal(3, parkingLot.EmptySlots)
+	assert.Equal(5, parkingLot.TotalSlots)
+	assert.Equal([]int{2, 4, 5}, parkingLot.SlotsAvailable)
+}

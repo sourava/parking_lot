@@ -36,3 +36,39 @@ func (p *ParkingLot) Park() (int, error) {
 	p.EmptySlots = p.EmptySlots - 1
 	return firstSlot, nil
 }
+
+func (p *ParkingLot) UnPark(slotNumber int) error {
+	if slotNumber <= 0 || slotNumber > p.TotalSlots {
+		return errors.New("Invalid slot number")
+	}
+
+	if p.checkIfSlotEmpty(slotNumber) {
+		return errors.New("Slot already empty")
+	}
+
+	index := p.getIndexToInsert(slotNumber)
+
+	p.SlotsAvailable = append(p.SlotsAvailable, 0)
+	copy(p.SlotsAvailable[index+1:], p.SlotsAvailable[index:])
+	p.SlotsAvailable[index] = slotNumber
+	p.EmptySlots = p.EmptySlots + 1
+	return nil
+}
+
+func (p *ParkingLot) getIndexToInsert(slotNumber int) int {
+	for index, slot := range p.SlotsAvailable {
+		if slotNumber < slot {
+			return index
+		}
+	}
+	return p.EmptySlots
+}
+
+func (p *ParkingLot) checkIfSlotEmpty(slotNumber int) bool {
+	for _, slot := range p.SlotsAvailable {
+		if slotNumber == slot {
+			return true
+		}
+	}
+	return false
+}
