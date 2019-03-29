@@ -97,3 +97,32 @@ func TestUnPark_ShouldMakeSlotNumberAvailable_WhenGivenSlotNumberIsFilled(t *tes
 	assert.Equal(5, parkingLot.TotalSlots)
 	assert.Equal([]int{2, 4, 5}, parkingLot.SlotsAvailable)
 }
+
+func TestPark_ShouldReturnNearestSlot_WhenSlotsAreAvailable(t *testing.T) {
+	assert := assert.New(t)
+	parkingLot, err := New(5)
+	
+	slotNumber, err := parkingLot.Park()
+	assert.Equal(1, slotNumber)
+	assert.Nil(err)
+	slotNumber, err = parkingLot.Park()
+	assert.Equal(2, slotNumber)
+	assert.Nil(err)
+	slotNumber, err = parkingLot.Park()
+	assert.Equal(3, slotNumber)
+	assert.Nil(err)
+	slotNumber, err = parkingLot.Park()
+	assert.Equal(4, slotNumber)
+	assert.Nil(err)
+
+	err = parkingLot.UnPark(2)
+	err = parkingLot.UnPark(4)
+
+	slotNumber, err = parkingLot.Park()
+	assert.Equal(2, slotNumber)
+	assert.Nil(err)
+
+	slotNumber, err = parkingLot.Park()
+	assert.Equal(4, slotNumber)
+	assert.Nil(err)
+}
