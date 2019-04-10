@@ -2,6 +2,9 @@ package parkinglot
 
 import (
 	"testing"
+
+	"parking_lot/cmd/parkinglot/models"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,32 +25,35 @@ func TestNew_ShouldReturnParkingLot_WhenNumberOfSlotsIsPositive(t *testing.T) {
 	assert.Nil(err)
 	assert.Equal(5, parkingLot.TotalSlots)
 	assert.Equal(5, parkingLot.EmptySlots)
-	assert.Equal([]int{1, 2, 3, 4, 5}, parkingLot.SlotsAvailable)
 }
 
-func TestPark_ShouldReturnError_WhenSlotsAreNotAvailable(t *testing.T) {
+func TestPark_ShouldReturnError_WhenGivenACarAndSlotsAreNotAvailable(t *testing.T) {
 	assert := assert.New(t)
 
 	parkingLot, err := New(1)
-	slot, err := parkingLot.Park()
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	slot, err := parkingLot.Park(car1)
 
 	assert.Nil(err)
 	assert.Equal(1, slot)
 
-	slot, err = parkingLot.Park()
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	slot, err = parkingLot.Park(car2)
 	assert.NotNil(err)
 }
 
-func TestPark_ShouldReturnASlot_WhenSlotsAreAvailable(t *testing.T) {
+func TestPark_ShouldReturnASlot_WhenGivenACarAndSlotsAreAvailable(t *testing.T) {
 	assert := assert.New(t)
 
 	parkingLot, err := New(5)
-	slot, err := parkingLot.Park()
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	slot, err := parkingLot.Park(car1)
 
 	assert.Nil(err)
 	assert.Equal(1, slot)
 
-	slot, err = parkingLot.Park()
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	slot, err = parkingLot.Park(car2)
 	assert.Nil(err)
 	assert.Equal(2, slot)
 }
@@ -57,11 +63,13 @@ func TestUnPark_ShouldReturnError_WhenGivenSlotNumberIsNotInRange(t *testing.T) 
 
 	parkingLot, err := New(5)
 
-	err = parkingLot.UnPark(0)
+	car, err := parkingLot.UnPark(0)
+	assert.Nil(car)
 	assert.NotNil(err)
 	assert.Equal("Invalid slot number", err.Error())
 
-	err = parkingLot.UnPark(6)
+	car, err = parkingLot.UnPark(6)
+	assert.Nil(car)
 	assert.NotNil(err)
 	assert.Equal("Invalid slot number", err.Error())
 }
@@ -71,58 +79,67 @@ func TestUnPark_ShouldReturnError_WhenGivenSlotNumberIsAlreadyEmpty(t *testing.T
 
 	parkingLot, err := New(5)
 
-	err = parkingLot.UnPark(4)
+	car, err := parkingLot.UnPark(4)
+	assert.Nil(car)
 	assert.NotNil(err)
 	assert.Equal("Slot already empty", err.Error())
 }
 
-func TestUnPark_ShouldMakeSlotNumberAvailable_WhenGivenSlotNumberIsFilled(t *testing.T) {
+func TestUnPark_ShouldReturnParkedCar_WhenGivenSlotNumberIsFilled(t *testing.T) {
 	assert := assert.New(t)
 
 	parkingLot, err := New(5)
-	_, err = parkingLot.Park()
-	_, err = parkingLot.Park()
-	_, err = parkingLot.Park()
-	_, err = parkingLot.Park()
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	car3 := models.NewCar("KA-03-HH-1234", "White")
+	car4 := models.NewCar("KA-04-HH-1234", "White")
+	_, err = parkingLot.Park(car1)
+	_, err = parkingLot.Park(car2)
+	_, err = parkingLot.Park(car3)
+	_, err = parkingLot.Park(car4)
 
-	err = parkingLot.UnPark(2)
+	unparkedCar, err := parkingLot.UnPark(2)
+	assert.Equal(car2, unparkedCar)
 	assert.Nil(err)
 	assert.Equal(2, parkingLot.EmptySlots)
 	assert.Equal(5, parkingLot.TotalSlots)
-	assert.Equal([]int{2, 5}, parkingLot.SlotsAvailable)
 
-	err = parkingLot.UnPark(4)
+	unparkedCar, err = parkingLot.UnPark(4)
+	assert.Equal(car4, unparkedCar)
 	assert.Nil(err)
 	assert.Equal(3, parkingLot.EmptySlots)
 	assert.Equal(5, parkingLot.TotalSlots)
-	assert.Equal([]int{2, 4, 5}, parkingLot.SlotsAvailable)
 }
 
 func TestPark_ShouldReturnNearestSlot_WhenSlotsAreAvailable(t *testing.T) {
 	assert := assert.New(t)
 	parkingLot, err := New(5)
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	car3 := models.NewCar("KA-03-HH-1234", "White")
+	car4 := models.NewCar("KA-04-HH-1234", "White")
 	
-	slotNumber, err := parkingLot.Park()
+	slotNumber, err := parkingLot.Park(car1)
 	assert.Equal(1, slotNumber)
 	assert.Nil(err)
-	slotNumber, err = parkingLot.Park()
+	slotNumber, err = parkingLot.Park(car2)
 	assert.Equal(2, slotNumber)
 	assert.Nil(err)
-	slotNumber, err = parkingLot.Park()
+	slotNumber, err = parkingLot.Park(car3)
 	assert.Equal(3, slotNumber)
 	assert.Nil(err)
-	slotNumber, err = parkingLot.Park()
+	slotNumber, err = parkingLot.Park(car4)
 	assert.Equal(4, slotNumber)
 	assert.Nil(err)
 
-	err = parkingLot.UnPark(2)
-	err = parkingLot.UnPark(4)
+	_, err = parkingLot.UnPark(2)
+	_, err = parkingLot.UnPark(4)
 
-	slotNumber, err = parkingLot.Park()
+	slotNumber, err = parkingLot.Park(car2)
 	assert.Equal(2, slotNumber)
 	assert.Nil(err)
 
-	slotNumber, err = parkingLot.Park()
+	slotNumber, err = parkingLot.Park(car4)
 	assert.Equal(4, slotNumber)
 	assert.Nil(err)
 }
