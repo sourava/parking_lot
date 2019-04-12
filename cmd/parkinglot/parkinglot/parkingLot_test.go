@@ -23,8 +23,8 @@ func TestNew_ShouldReturnParkingLot_WhenNumberOfSlotsIsPositive(t *testing.T) {
 	parkingLot, err := New(5)
 
 	assert.Nil(err)
-	assert.Equal(5, parkingLot.TotalSlots)
-	assert.Equal(5, parkingLot.EmptySlots)
+	assert.Equal(5, parkingLot.TotalSlots())
+	assert.Equal(5, parkingLot.EmptySlots())
 }
 
 func TestPark_ShouldReturnError_WhenGivenACarAndSlotsAreNotAvailable(t *testing.T) {
@@ -101,14 +101,14 @@ func TestUnPark_ShouldReturnParkedCar_WhenGivenSlotNumberIsFilled(t *testing.T) 
 	unparkedCar, err := parkingLot.UnPark(2)
 	assert.Equal(car2, unparkedCar)
 	assert.Nil(err)
-	assert.Equal(2, parkingLot.EmptySlots)
-	assert.Equal(5, parkingLot.TotalSlots)
+	assert.Equal(2, parkingLot.EmptySlots())
+	assert.Equal(5, parkingLot.TotalSlots())
 
 	unparkedCar, err = parkingLot.UnPark(4)
 	assert.Equal(car4, unparkedCar)
 	assert.Nil(err)
-	assert.Equal(3, parkingLot.EmptySlots)
-	assert.Equal(5, parkingLot.TotalSlots)
+	assert.Equal(3, parkingLot.EmptySlots())
+	assert.Equal(5, parkingLot.TotalSlots())
 }
 
 func TestPark_ShouldReturnNearestSlot_WhenSlotsAreAvailable(t *testing.T) {

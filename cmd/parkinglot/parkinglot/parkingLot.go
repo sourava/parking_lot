@@ -6,10 +6,10 @@ import (
 )
 
 type ParkingLot struct {
-	SlotsAvailable []int
-	TotalSlots int
-	EmptySlots int
-	SlotToCarMap map[int]*models.Car
+	slotsAvailable []int
+	totalSlots int
+	emptySlots int
+	slotToCarMap map[int]*models.Car
 }
 
 func New(numberOfSlots int) (*ParkingLot, error) {
@@ -23,26 +23,34 @@ func New(numberOfSlots int) (*ParkingLot, error) {
 		slotsAvailable[index] = index + 1
 	}
 	return &ParkingLot {
-		SlotsAvailable: slotsAvailable,
-		TotalSlots: numberOfSlots,
-		EmptySlots: numberOfSlots,
-		SlotToCarMap: make(map[int]*models.Car),
+		slotsAvailable: slotsAvailable,
+		totalSlots: numberOfSlots,
+		emptySlots: numberOfSlots,
+		slotToCarMap: make(map[int]*models.Car),
 	}, nil
 }
 
+func (p *ParkingLot) TotalSlots() int {
+	return p.totalSlots
+}
+
+func (p *ParkingLot) EmptySlots() int {
+	return p.emptySlots
+}
+
 func (p *ParkingLot) Park(car *models.Car) (int, error) {
-	if p.EmptySlots == 0 {
+	if p.emptySlots == 0 {
 		return 0, errors.New("Sorry, parking lot is full")
 	}
-	firstSlot := p.SlotsAvailable[0]
-	p.SlotsAvailable = p.SlotsAvailable[1:]
-	p.EmptySlots = p.EmptySlots - 1
-	p.SlotToCarMap[firstSlot] = car
+	firstSlot := p.slotsAvailable[0]
+	p.slotsAvailable = p.slotsAvailable[1:]
+	p.emptySlots = p.emptySlots - 1
+	p.slotToCarMap[firstSlot] = car
 	return firstSlot, nil
 }
 
 func (p *ParkingLot) UnPark(slotNumber int) (*models.Car, error) {
-	if slotNumber <= 0 || slotNumber > p.TotalSlots {
+	if slotNumber <= 0 || slotNumber > p.totalSlots {
 		return nil, errors.New("Invalid slot number")
 	}
 
@@ -52,29 +60,29 @@ func (p *ParkingLot) UnPark(slotNumber int) (*models.Car, error) {
 
 	index := p.getIndexToInsert(slotNumber)
 
-	p.SlotsAvailable = append(p.SlotsAvailable, 0)
-	copy(p.SlotsAvailable[index+1:], p.SlotsAvailable[index:])
-	p.SlotsAvailable[index] = slotNumber
+	p.slotsAvailable = append(p.slotsAvailable, 0)
+	copy(p.slotsAvailable[index+1:], p.slotsAvailable[index:])
+	p.slotsAvailable[index] = slotNumber
 
-	p.EmptySlots = p.EmptySlots + 1
+	p.emptySlots = p.emptySlots + 1
 	
-	unparkedCar := p.SlotToCarMap[slotNumber]
-	delete(p.SlotToCarMap, slotNumber);
+	unparkedCar := p.slotToCarMap[slotNumber]
+	delete(p.slotToCarMap, slotNumber);
 	
 	return unparkedCar, nil
 }
 
 func (p *ParkingLot) getIndexToInsert(slotNumber int) int {
-	for index, slot := range p.SlotsAvailable {
+	for index, slot := range p.slotsAvailable {
 		if slotNumber < slot {
 			return index
 		}
 	}
-	return p.EmptySlots
+	return p.emptySlots
 }
 
 func (p *ParkingLot) checkIfSlotEmpty(slotNumber int) bool {
-	for _, slot := range p.SlotsAvailable {
+	for _, slot := range p.slotsAvailable {
 		if slotNumber == slot {
 			return true
 		}
