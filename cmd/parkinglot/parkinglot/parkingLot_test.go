@@ -143,3 +143,113 @@ func TestPark_ShouldReturnNearestSlot_WhenSlotsAreAvailable(t *testing.T) {
 	assert.Equal(4, slotNumber)
 	assert.Nil(err)
 }
+
+func TestSlotNumbersForCarsWithColor_ShouldReturnError_WhenNoSlotsFilledWithCarWithGivenColor(t *testing.T) {
+	assert := assert.New(t)
+	parkingLot, _ := New(5)
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	
+	parkingLot.Park(car1)
+	parkingLot.Park(car2)
+
+	slotNumbers, err := parkingLot.SlotNumbersForCarsWithColor("Black")
+	assert.Nil(slotNumbers)
+	assert.NotNil(err)
+}
+
+func TestSlotNumbersForCarsWithColor_ShouldReturnSlotNumbers_WhenSlotsAreFilledWithCarWithGivenColor(t *testing.T) {
+	assert := assert.New(t)
+	parkingLot, _ := New(5)
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	
+	parkingLot.Park(car1)
+	parkingLot.Park(car2)
+
+	slotNumbers, err := parkingLot.SlotNumbersForCarsWithColor("White")
+	expectedSlotNumbers := []int{1, 2}
+	assert.Equal(expectedSlotNumbers, slotNumbers)
+	assert.Nil(err)
+}
+
+func TestSlotNumberForRegistrationNumber_ShouldReturnError_WhenNoSlotFilledWithCarWithGivenRegistrationNumber(t *testing.T) {
+	assert := assert.New(t)
+	parkingLot, _ := New(5)
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	
+	parkingLot.Park(car1)
+	parkingLot.Park(car2)
+
+	slotNumber, err := parkingLot.SlotNumberForRegistrationNumber("KA-03-HH-1234")
+	assert.Equal(-1, slotNumber)
+	assert.NotNil(err)
+}
+
+func TestSlotNumberForRegistrationNumber_ShouldReturnSlotNumber_WhenSlotFilledWithCarWithGivenRegistrationNumber(t *testing.T) {
+	assert := assert.New(t)
+	parkingLot, _ := New(5)
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	
+	parkingLot.Park(car1)
+	parkingLot.Park(car2)
+
+	slotNumber, err := parkingLot.SlotNumberForRegistrationNumber("KA-02-HH-1234")
+	assert.Equal(2, slotNumber)
+	assert.Nil(err)
+}
+
+func TestRegistrationNumbersForCarsWithColor_ShouldReturnError_WhenNoSlotsFilledWithCarHavingGivenColor(t *testing.T) {
+	assert := assert.New(t)
+	parkingLot, _ := New(5)
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	
+	parkingLot.Park(car1)
+	parkingLot.Park(car2)
+
+	registrationNumbers, err := parkingLot.RegistrationNumbersForCarsWithColor("Black")
+	assert.Nil(registrationNumbers)
+	assert.NotNil(err)
+}
+
+func TestRegistrationNumbersForCarsWithColor_ShouldReturnRegistrationNumbers_WhenSlotsAreFilledWithCarHavingGivenColor(t *testing.T) {
+	assert := assert.New(t)
+	parkingLot, _ := New(5)
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	
+	parkingLot.Park(car1)
+	parkingLot.Park(car2)
+
+	registrationNumbers, err := parkingLot.RegistrationNumbersForCarsWithColor("White")
+	expectedRegistrationNumbers := []string{"KA-01-HH-1234", "KA-02-HH-1234"}
+	assert.Equal(expectedRegistrationNumbers, registrationNumbers)
+	assert.Nil(err)
+}
+
+func TestStatus_ShouldReturnAllDetails_WhenSlotsAreFilledWithCars(t *testing.T) {
+	assert := assert.New(t)
+	parkingLot, _ := New(5)
+	car1 := models.NewCar("KA-01-HH-1234", "White")
+	car2 := models.NewCar("KA-02-HH-1234", "White")
+	car3 := models.NewCar("KA-03-HH-1234", "White")
+	car4 := models.NewCar("KA-04-HH-1234", "White")
+	
+	parkingLot.Park(car1)
+	parkingLot.Park(car2)
+	parkingLot.Park(car3)
+	parkingLot.Park(car4)
+
+	actualOutput := parkingLot.Status()
+	expectedOutput := [][]string{
+		{"1", "KA-01-HH-1234", "White"}, 
+		{"2", "KA-02-HH-1234", "White"}, 
+		{"3", "KA-03-HH-1234", "White"}, 
+		{"4", "KA-04-HH-1234", "White"},
+	}
+
+	assert.Equal(expectedOutput, actualOutput)
+}

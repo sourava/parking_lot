@@ -1,6 +1,8 @@
 package parkinglot
 
 import (
+	"strconv"
+	"sort"
 	"errors"
 	"parking_lot/cmd/parkinglot/models"
 )
@@ -10,6 +12,7 @@ type ParkingLot struct {
 	totalSlots int
 	emptySlots int
 	slotToCarMap map[int]*models.Car
+	query *Query
 }
 
 func New(numberOfSlots int) (*ParkingLot, error) {
@@ -27,6 +30,7 @@ func New(numberOfSlots int) (*ParkingLot, error) {
 		totalSlots: numberOfSlots,
 		emptySlots: numberOfSlots,
 		slotToCarMap: make(map[int]*models.Car),
+		query: NewQuery(),
 	}, nil
 }
 
@@ -46,6 +50,7 @@ func (p *ParkingLot) Park(car *models.Car) (int, error) {
 	p.slotsAvailable = p.slotsAvailable[1:]
 	p.emptySlots = p.emptySlots - 1
 	p.slotToCarMap[firstSlot] = car
+	p.query.Add(car, firstSlot)
 	return firstSlot, nil
 }
 
@@ -56,6 +61,11 @@ func (p *ParkingLot) UnPark(slotNumber int) (*models.Car, error) {
 
 	if p.checkIfSlotEmpty(slotNumber) {
 		return nil, errors.New("Slot already empty")
+	}
+
+	err := p.query.Remove(p.slotToCarMap[slotNumber], slotNumber)
+	if err != nil {
+		return nil, err
 	}
 
 	index := p.getIndexToInsert(slotNumber)
@@ -70,6 +80,41 @@ func (p *ParkingLot) UnPark(slotNumber int) (*models.Car, error) {
 	delete(p.slotToCarMap, slotNumber);
 	
 	return unparkedCar, nil
+}
+
+func (p *ParkingLot) SlotNumbersForCarsWithColor(color string) ([]int, error) {
+	return p.query.SlotNumbersForCarsWithColor(color)
+}
+
+func (p *ParkingLot) SlotNumberForRegistrationNumber(registrationNumber string) (int, error) {
+	return p.query.SlotNumberForRegistrationNumber(registrationNumber)
+}
+
+func (p *ParkingLot) RegistrationNumbersForCarsWithColor(color string) ([]string, error) {
+	registrationNumbers := []string{}
+	slotNumbers, err := p.SlotNumbersForCarsWithColor(color)
+	if err != nil {
+		return nil, err
+	}
+	for _, value := range(slotNumbers) {
+		registrationNumbers = append(registrationNumbers, p.slotToCarMap[value].RegistrationNumber())
+	}
+	return registrationNumbers, nil
+}
+
+func (p *ParkingLot) Status() [][]string {
+	keys := []int{}
+	details := [][]string{}
+    for key := range p.slotToCarMap {
+        keys = append(keys, key)
+	}
+	
+	sort.Ints(keys)
+	
+	for _, key := range keys {
+		details = append(details, []string{strconv.Itoa(key), p.slotToCarMap[key].RegistrationNumber(), p.slotToCarMap[key].Color()})
+	}
+	return details
 }
 
 func (p *ParkingLot) getIndexToInsert(slotNumber int) int {
