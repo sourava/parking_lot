@@ -3,6 +3,7 @@ package parkinglot
 import (
 	"errors"
 	"parking_lot/cmd/parkinglot/models"
+	"parking_lot/cmd/parkinglot/constants"
 )
 
 type Query struct {
@@ -35,7 +36,7 @@ func (q *Query) Remove(car *models.Car, slotNumber int) error {
 		return err
 	}
 	if _, present := q.registrationNumberToSlotMap[car.RegistrationNumber()]; !present {
-		return errors.New("")
+		return errors.New(constants.NotFound)
 	}
 	
 	q.colorToSlotsMap[car.Color()] = remainingSlots
@@ -47,14 +48,14 @@ func (q *Query) SlotNumbersForCarsWithColor(color string) ([]int, error){
 	if value, present := q.colorToSlotsMap[color]; present {
 		return value, nil
 	}
-	return nil, errors.New("Not found")
+	return nil, errors.New(constants.NotFound)
 }
 
 func (q *Query) SlotNumberForRegistrationNumber(registrationNumber string) (int, error) {
 	if value, present := q.registrationNumberToSlotMap[registrationNumber]; present {
 		return value, nil
 	}
-	return -1, errors.New("Not found")
+	return -1, errors.New(constants.NotFound)
 }
 
 func deleteElementFromSlice(slice []int, element int) ([]int, error) {
@@ -68,5 +69,5 @@ func deleteElementFromSlice(slice []int, element int) ([]int, error) {
 	if position != -1 {
 		return append(slice[:position], slice[position+1:]...), nil
 	}
-	return nil, errors.New("Not found")
+	return nil, errors.New(constants.NotFound)
 }

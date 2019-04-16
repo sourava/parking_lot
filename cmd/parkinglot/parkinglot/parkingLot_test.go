@@ -15,6 +15,7 @@ func TestNew_ShouldReturnError_WhenNumberOfSlotsIsNotAPositiveNumber(t *testing.
 
 	assert.Nil(parkingLot)
 	assert.NotNil(err)
+	assert.Equal("Enter positive number of slots", err.Error())
 }
   
 func TestNew_ShouldReturnParkingLot_WhenNumberOfSlotsIsPositive(t *testing.T) {
@@ -40,6 +41,7 @@ func TestPark_ShouldReturnError_WhenGivenACarAndSlotsAreNotAvailable(t *testing.
 	car2 := models.NewCar("KA-02-HH-1234", "White")
 	slot, err = parkingLot.Park(car2)
 	assert.NotNil(err)
+	assert.Equal("Sorry, parking lot is full", err.Error())
 }
 
 func TestPark_ShouldReturnASlot_WhenGivenACarAndSlotsAreAvailable(t *testing.T) {

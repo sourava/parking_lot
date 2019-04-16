@@ -5,6 +5,7 @@ import (
 	"sort"
 	"errors"
 	"parking_lot/cmd/parkinglot/models"
+	"parking_lot/cmd/parkinglot/constants"
 )
 
 type ParkingLot struct {
@@ -17,7 +18,7 @@ type ParkingLot struct {
 
 func New(numberOfSlots int) (*ParkingLot, error) {
 	if numberOfSlots <= 0 {
-		return nil, errors.New("Enter positive number in numberOfSlots")
+		return nil, errors.New(constants.CreateParkingLotError)
 	}
 
 	index := 0
@@ -44,7 +45,7 @@ func (p *ParkingLot) EmptySlots() int {
 
 func (p *ParkingLot) Park(car *models.Car) (int, error) {
 	if p.emptySlots == 0 {
-		return 0, errors.New("Sorry, parking lot is full")
+		return 0, errors.New(constants.ParkError)
 	}
 	firstSlot := p.slotsAvailable[0]
 	p.slotsAvailable = p.slotsAvailable[1:]
@@ -56,11 +57,11 @@ func (p *ParkingLot) Park(car *models.Car) (int, error) {
 
 func (p *ParkingLot) UnPark(slotNumber int) (*models.Car, error) {
 	if slotNumber <= 0 || slotNumber > p.totalSlots {
-		return nil, errors.New("Invalid slot number")
+		return nil, errors.New(constants.UnParkInvalidSlotError)
 	}
 
 	if p.checkIfSlotEmpty(slotNumber) {
-		return nil, errors.New("Slot already empty")
+		return nil, errors.New(constants.UnParkSlotAlreadyEmptyError)
 	}
 
 	err := p.query.Remove(p.slotToCarMap[slotNumber], slotNumber)

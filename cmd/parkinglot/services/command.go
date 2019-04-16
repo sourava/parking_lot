@@ -2,6 +2,8 @@ package services
 
 import (
 	"fmt"
+	"text/tabwriter"
+	"os"
 	"strings"
 	"strconv"
 	"parking_lot/cmd/parkinglot/parkinglot"
@@ -77,10 +79,14 @@ func (c *CommandService) leave(slotNumber int) {
 }
 
 func (c *CommandService) status() {
+	w := new(tabwriter.Writer)
+	w.Init(os.Stdout, 8, 8, 4, ' ', 0)
+	defer w.Flush()
+	fmt.Fprintf(w, "%s\t%s\t%s\n", constants.SlotNo, constants.RegistrationNo, constants.Color)
+
 	details := c.parking.Status()
-	fmt.Println(constants.SlotNo, constants.RegistrationNo, constants.Color)
 	for _, detail := range details {
-		fmt.Println(detail[0], detail[1], detail[2])
+		fmt.Fprintf(w, "%s\t%s\t%s\n", detail[0], detail[1], detail[2])
 	}
 }
 

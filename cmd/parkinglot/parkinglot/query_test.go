@@ -16,6 +16,7 @@ func TestSlotNumbersForCarsWithColor_ShouldReturnError_WhenNoSlotsFilledWithCarH
 	slotNumbers, err := query.SlotNumbersForCarsWithColor("White")
 	assert.Nil(slotNumbers)
 	assert.NotNil(err)
+	assert.Equal("Not found", err.Error())
 }
 
 func TestSlotNumbersForCarsWithColor_ShouldReturnSlotNumbers_WhenSlotsAreFilledWithCarHavingGivenColor(t *testing.T) {
@@ -38,6 +39,7 @@ func TestSlotNumberForRegistrationNumber_ShouldReturnError_WhenNoSlotFilledWithC
 
 	_, err := query.SlotNumberForRegistrationNumber("KA-01-HH-1234")
 	assert.NotNil(err)
+	assert.Equal("Not found", err.Error())
 }
 
 func TestSlotNumberForRegistrationNumber_ShouldReturnSlotNumber_WhenSlotFilledWithCarHavingGivenRegistrationNumber(t *testing.T) {
