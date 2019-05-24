@@ -2,6 +2,7 @@ package multiparking
 
 import (
 	"parking_lot/cmd/parkinglot/parkinglot"
+	"parking_lot/cmd/parkinglot/models"
 )
 
 type MultiParking struct {
@@ -22,4 +23,8 @@ func (m *MultiParking) AddParkingLot(parkingLot *parkinglot.ParkingLot) {
 
 func (m *MultiParking) AddParkingStrategy(strategy string) {
 	m.strategy = strategy
+}
+
+func (m *MultiParking) Park(car *models.Car) (int, error) {
+	return m.parkingLots[0].Park(car)
 }
