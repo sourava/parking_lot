@@ -12,4 +12,6 @@ const (
 	RegistrationNo string = "Registration No"
 	Color string = "Colour"
 	NotFound string = "Not found"
+	EvenDistribution string = "Even distribution"
+	FillFirst string = "Fill first"
 )
